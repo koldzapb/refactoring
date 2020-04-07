@@ -4,7 +4,6 @@
 namespace App\DBRepository;
 
 
-use App\Reporting\JsonReporter;
 use App\Reporting\ReporterInterface;
 
 class UserSQL
@@ -19,46 +18,50 @@ class UserSQL
      * @var ReporterInterface
      */
     private $reporter;
-    /**
-     * @var \PDO|void
-     */
-    private $conn;
 
 
-    public function __construct(ReporterInterface $reporter)
+    public function __construct(ReporterInterface $reporter, DBConnectionInterface $connection)
     {
-        $this->connection = new PDOConnection;
-        $this->conn = $this->connection->connect(new JsonReporter);
+        $this->connection = $connection;
+        $this->connection->connect();
         $this->reporter = $reporter;
     }
 
 
-    public function getUserEmail($email){
+    /**
+     * @param $email
+     * @return mixed
+     */
+    public function getUserEmail($email)
+    {
 
-        $statement = $this->conn->prepare('SELECT * FROM user WHERE email = :email');
-        $statement->execute(array('email' => $email));
-        if ($statement->fetchColumn() > 0){
-            $this->reporter->report([
-                'success' => false,
-                'error' => 'user_already_exists'
-            ]);exit;
-        }
-
-    }
-    public function saveNewUser($email, $password){
-
-        $statement = $this->conn->prepare('INSERT INTO user SET email = :email, password = :password');
-        $statement->execute(array('email' => $email, 'password' => md5($password)));
-
-        $this->setUserid($this->conn->lastInsertId());
+        $query = 'SELECT * FROM user WHERE email = :email';
+        $variables = ['email' => $email];
+        return $this->connection->runPrepareStatmentQuery($query, $variables, true);
 
     }
 
-    public function registerNewUser(){
+    /**
+     * @param $email
+     * @param $password
+     */
+    public function saveNewUser($email, $password)
+    {
 
-        $statement = $this->conn->prepare('INSERT INTO user_log SET action = "register", user_id = :userid, log_time = NOW()');
-        $statement->execute(array('userid' => $this->getUserid()));
+        $query = 'INSERT INTO user SET email = :email, password = :password';
+        $variables = ['email' => $email, 'password' => md5($password)];
+        $this->connection->runPrepareStatmentQuery($query, $variables);
 
+        $this->setUserid($this->connection->getLastInsertedId());
+
+    }
+
+
+    public function registerNewUser()
+    {
+        $query = 'INSERT INTO user_log SET action = "register", user_id = :userid, log_time = NOW()';
+        $variables = ['userid' => $this->getUserid()];
+        $this->connection->runPrepareStatmentQuery($query, $variables);
     }
 
     /**

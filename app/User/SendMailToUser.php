@@ -6,10 +6,26 @@ namespace App\User;
 
 class SendMailToUser
 {
-    public function sendMail($email, $subject, $message, $headers= null){
+    /**
+     * @var EmailData
+     */
+    private $data;
 
-        mail($email, $subject, $message, $headers);
+    /**
+     * SendMailToUser constructor.
+     * @param EmailData $data
+     */
+    public function __construct(EmailData $data)
+    {
+        $this->data = $data;
+    }
 
+    /**
+     * @param $email
+     */
+    public function sendMail($email)
+    {
+        mail($email, $this->data->getSubject(), $this->data->getMessage(), $this->data->getHeaders());
     }
 
 }

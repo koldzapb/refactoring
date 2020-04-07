@@ -11,6 +11,10 @@ use App\Validation\Validation;
 class User
 {
 
+    /**
+     * @var UserSQL
+     */
+    public $sql;
     private $email;
     private $password;
     private $password2;
@@ -18,43 +22,91 @@ class User
      * @var Validation
      */
     private $validator;
+    /**
+     * @var SendMailToUser
+     */
+    private $send;
+    /**
+     * @var ReporterInterface
+     */
+    private $reporter;
 
     /**
      * User constructor.
-     * @param $email
-     * @param $password
-     * @param $password2
-     * @param Validation $validator
+     * @param UserSQL $sql
+     * @param SendMailToUser $send
+     * @param ReporterInterface $reporter
      */
-    public function __construct($email, $password, $password2, Validation $validator)
+    public function __construct(UserSQL $sql, SendMailToUser $send, ReporterInterface $reporter)
     {
-        $this->email = $email;
-        $this->password = $password;
-        $this->password2 = $password2;
-        $this->validator = $validator;
+        $this->sql = $sql;
+        $this->send = $send;
+        $this->reporter = $reporter;
+    }
 
-        $this->validator->name('email')->value($this->email)->required()->is_email($this->email);
-        $this->validator->name('password')->value($this->password)->required()->min(8)->equal($this->password2);
-        $this->validator->name('password2')->value($this->password2)->required()->min(8);
 
+    public function saveNewUser()
+    {
+
+        $this->sql->saveNewUser($this->email, $this->password);
+        $this->send->sendMail($this->email);
+        $this->sql->registerNewUser();
+
+
+        $_SESSION['userId'] = $this->sql->getUserid();
+
+        $this->reporter->report([
+            'success' => true,
+            'userId' => $this->sql->getUserid()
+        ]);
 
     }
 
-    public function saveNewUser(UserSQL $sql, SendMailToUser $send, ReporterInterface $reporter)
+    /**
+     * @return mixed
+     */
+    public function getEmail()
     {
+        return $this->email;
+    }
 
-        $sql->getUserEmail($this->email);
-        $sql->saveNewUser($this->email, $this->password);
-        $send->sendMail($this->email, 'Dobro došli', 'Dobro dosli na nas sajt. Potrebno je samo da potvrdite email adresu ...', 'adm@kupujemprodajem.com');
-        $sql->registerNewUser();
+    /**
+     * @param mixed $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
 
+    /**
+     * @return mixed
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
 
-        $_SESSION['userId'] = $sql->getUserid();
+    /**
+     * @param mixed $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
 
-        $reporter->report([
-            'success' => true,
-            'userId' => $sql->getUserid()
-        ]);
+    /**
+     * @return mixed
+     */
+    public function getPassword2()
+    {
+        return $this->password2;
+    }
 
+    /**
+     * @param mixed $password2
+     */
+    public function setPassword2($password2)
+    {
+        $this->password2 = $password2;
     }
 }

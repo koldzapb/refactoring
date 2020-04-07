@@ -1,0 +1,48 @@
+{
+  "services": {
+    "App\\User\\User": {
+      "class": "App\\User\\User",
+      "arguments": null
+    },
+    "App\\User\\SendMailToUser": {
+      "class": "App\\User\\SendMailToUser",
+      "arguments": null
+    },
+    "App\\DBRepository\\DBConnectionInterface": {
+      "class": "App\\DBRepository\\PDOConnection",
+      "arguments": null
+    },
+    "App\\DBRepository\\UserSQL": {
+      "class": "App\\DBRepository\\UserSQL",
+      "arguments": null
+    },
+    "App\\Reporting\\ReporterInterface": {
+      "class": "App\\Reporting\\JsonReporter",
+      "arguments": null
+    },
+    "App\\Validation\\Validation": {
+      "class": "App\\Validation\\Validation",
+      "arguments": null
+    },
+    "App\\Chain\\Authenticate": {
+      "class": "App\\Chain\\Authenticate",
+      "arguments": null
+    },
+    "App\\Chain\\EmailChain": {
+      "class": "App\\Chain\\EmailChain",
+      "arguments": null
+    },
+    "App\\Chain\\PasswordChain": {
+      "class": "App\\Chain\\PasswordChain",
+      "arguments": null
+    },
+    "App\\Chain\\UserExistsChain": {
+      "class": "App\\Chain\\UserExistsChain",
+      "arguments": null
+    },
+    "App\\User\\EmailData": {
+      "class": "App\\User\\EmailData",
+      "arguments": null
+    }
+  }
+}

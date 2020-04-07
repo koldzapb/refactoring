@@ -19,7 +19,8 @@ class NewPDOException extends PDOException
         $reporter->report([
             'success' => false,
             'error' => 'DB_error'
-        ]);exit;
+        ]);
+        exit;
     }
 
 }
